@@ -8,12 +8,24 @@ const { Header, Content, Footer, Sider } = Layout
 
 const App: React.FC = () => {
     const [dialogs, setDialogs] = useState([])
+    const [conversation, setConversation] = useState<{
+        id: string
+        users: {
+            id: string
+        }[]
+    }>({
+        id: '',
+        users: [],
+    })
 
     // chat dialogs menu items
     const items: MenuProps['items'] = dialogs.map((dialog) => ({
         key: dialog.id,
         icon: React.createElement(UserOutlined),
         label: dialog.users[0].id,
+        onClick: () => {
+            setConversation(dialog)
+        },
     }))
 
     // add logout button
@@ -24,7 +36,7 @@ const App: React.FC = () => {
         onClick: () => {
             localStorage.removeItem('token')
             window.location.reload()
-        }
+        },
     })
 
     // fetch dialogs
@@ -58,8 +70,25 @@ const App: React.FC = () => {
                 />
             </Sider>
             <Layout style={{ marginLeft: 200 }}>
-                <Header style={{ padding: 0, background: colorBgContainer }} />
-                <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
+                <Header
+                    style={{
+                        position: 'sticky',
+                        top: 0,
+                        zIndex: 1,
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}
+                >
+                    <h1
+                        style={{
+                            color: '#fff',
+                        }}
+                    >
+                        {conversation.users?.[0]?.id}
+                    </h1>
+                </Header>
+                <Content style={{ margin: '24px 16px 0' }}>
                     <div
                         style={{
                             padding: 24,
@@ -80,9 +109,6 @@ const App: React.FC = () => {
                         }
                     </div>
                 </Content>
-                <Footer style={{ textAlign: 'center' }}>
-                    Ant Design ©{new Date().getFullYear()} Created by Ant UED
-                </Footer>
             </Layout>
         </Layout>
     )
