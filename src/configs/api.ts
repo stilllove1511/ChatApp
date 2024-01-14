@@ -1,7 +1,5 @@
 import { http } from "@utilities/http";
-import { httpAuth } from "@utilities/httpAuth";
 import STORAGES_CONFIG from "@configs/storage";
-import axios from "axios";
 import { ENDPOINT_API } from '@utilities/enums';
 
 export const BearerToken = () => {

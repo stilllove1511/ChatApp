@@ -12,11 +12,11 @@ Technical using
 Get node_modules
 
 ```bash
-yarn
+npm i
 ```
 
 Run the development server:
 
 ```bash
-yarn start
+npm start
 ```

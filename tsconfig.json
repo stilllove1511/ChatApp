@@ -17,8 +17,21 @@
     "incremental": true,
     "pretty": true,
     "noImplicitAny": false,
+    "baseUrl": ".",
+    "paths": {
+      "@assets/*": ["src/assets/*"],
+      "@components/*": ["src/components/*"],
+      "@configs/*": ["src/configs/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@pages/*": ["src/pages/*"],
+      "@redux/*": ["src/redux/*"],
+      "@routes/*": ["src/routes/*"],
+      "@ts/*": ["src/ts/*"],
+      "@utilities/*": ["src/utilities/*"],
+      "@src/*": ["src/*"],
+      "@public/*": ["public/*"]
+    }
   },
   "include": ["src"],
-  "exclude": ["node_modules"],
-  "extends": "./tsconfig.paths.json"
+  "exclude": ["node_modules"]
 }

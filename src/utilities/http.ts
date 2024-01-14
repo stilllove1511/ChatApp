@@ -1,7 +1,6 @@
 import axios from "axios";
-import ENVIRONMENT_CONFIG from "@configs/env";
 
 export const http = axios.create({
-  baseURL: ENVIRONMENT_CONFIG.host,
+  baseURL: process.env.REACT_APP_API_URL,
   timeout: 180000,
 });

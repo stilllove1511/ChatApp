@@ -2,7 +2,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Redirect, Route } from "react-router-dom";
 import { RootState } from "@redux/store";
-import AppLayout from "@components/AppLayout";
 
 interface Props {
   children?: React.ReactNode;
@@ -19,7 +18,7 @@ const PrivateRoute = ({ children, ...rest }: Props) => {
       {...rest}
       render={({ location }) =>
         isLogin ? (
-          <AppLayout>{children}</AppLayout>
+          <>{children}</>
         ) : (
           <Redirect
             to={{
