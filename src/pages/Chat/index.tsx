@@ -78,16 +78,18 @@ const Chat = () => {
 
         const [messageInputValue, setMessageInputValue] = useState('')
 
-        socket?.on('receiveMessageEvent', (message) => {
-            setMessages((messages) => [
-                ...messages,
-                {
-                    id: message.id,
-                    text: message.text,
-                    userId: conversation?.users?.[0]?.id,
-                },
-            ])
-        })
+        useEffect(() => {
+            socket?.on('receiveMessageEvent', (message) => {
+                setMessages((messages) => [
+                    ...messages,
+                    {
+                        id: Math.random(),
+                        text: message,
+                        userId: conversation?.users?.[0]?.id,
+                    },
+                ])
+            })
+        }, [])
 
         // send message
         const sendMessage = (message) => {
