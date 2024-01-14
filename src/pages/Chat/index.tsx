@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import type { MenuProps } from 'antd'
-import { Layout, Menu } from 'antd'
+import { Input, Layout, Menu } from 'antd'
 import API from '@configs/api'
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
 import { useSelector } from 'react-redux'
@@ -130,7 +130,23 @@ const App: React.FC = () => {
                             </span>
                         </div>
                     ))}
+                    <div
+                        style={{
+                            height: '50px',
+                            width: '100%',
+                        }}
+                    ></div>
                 </Content>
+                <Input
+                    style={{
+                        position: 'fixed',
+                        bottom: 0,
+                        zIndex: 1,
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}
+                />
             </Layout>
         </Layout>
     )
