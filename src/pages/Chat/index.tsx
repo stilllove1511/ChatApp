@@ -4,12 +4,12 @@ import { Input, Layout, Menu } from 'antd'
 import API from '@configs/api'
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
 import { useSelector } from 'react-redux'
+import { io } from 'socket.io-client'
 
-const { Header, Content, Footer, Sider } = Layout
+const { Header, Content, Sider } = Layout
 
-const App: React.FC = () => {
+const Chat = () => {
     const token = useSelector((state) => (state as any).auth.token)
-    const [dialogs, setDialogs] = useState([])
     const [conversation, setConversation] = useState<{
         id: string
         users: {
@@ -20,136 +20,196 @@ const App: React.FC = () => {
         users: [],
     })
 
-    // chat dialogs menu items
-    const items: MenuProps['items'] = dialogs.map((dialog) => ({
-        key: dialog.id,
-        icon: React.createElement(UserOutlined),
-        label: dialog.users[0].id,
-        onClick: () => {
-            setConversation(dialog)
-        },
-    }))
+    const socket = conversation.id
+        ? io('localhost:3002', {
+              query: {
+                  chatWith: conversation?.users?.[0]?.id,
+              },
+              extraHeaders: {
+                  user: token,
+              },
+          })
+        : undefined
 
-    // add logout button
-    items.unshift({
-        key: '1',
-        icon: React.createElement(LogoutOutlined),
-        label: 'Logout',
-        onClick: () => {
-            localStorage.removeItem('token')
-            window.location.reload()
-        },
-    })
+    const MessageHandleComponent: React.FC = () => {
+        const [dialogs, setDialogs] = useState([])
 
-    // fetch dialogs
-    useEffect(() => {
-        API.fetchDialogs().then((res) => {
-            setDialogs(res.data)
+        // chat dialogs menu items
+        const items: MenuProps['items'] = dialogs.map((dialog) => ({
+            key: dialog.id,
+            icon: React.createElement(UserOutlined),
+            label: dialog.users[0].id,
+            onClick: () => {
+                setConversation(dialog)
+            },
+        }))
+
+        // add logout button
+        items.unshift({
+            key: '1',
+            icon: React.createElement(LogoutOutlined),
+            label: 'Logout',
+            onClick: () => {
+                localStorage.removeItem('token')
+                window.location.reload()
+            },
         })
-    }, [])
 
-    // fetch messages
-    const [messages, setMessages] = useState([])
-    useEffect(() => {
-        if (!conversation.id) return
-        API.fetchMessages({
-            dialogId: conversation.id,
-            limit: 100,
-            page: 1,
-        }).then((res) => {
-            setMessages(res.data.messages)
+        // fetch dialogs
+        useEffect(() => {
+            API.fetchDialogs().then((res) => {
+                setDialogs(res.data)
+            })
+        }, [])
+
+        // fetch messages
+        const [messages, setMessages] = useState([])
+        useEffect(() => {
+            if (!conversation.id) return
+            API.fetchMessages({
+                dialogId: conversation.id,
+                limit: 100,
+                page: 1,
+            }).then((res) => {
+                setMessages(res.data.messages)
+            })
+        }, [conversation])
+
+        const [messageInputValue, setMessageInputValue] = useState('')
+
+        socket?.on('receiveMessageEvent', (message) => {
+            setMessages((messages) => [
+                ...messages,
+                {
+                    id: message.id,
+                    text: message.text,
+                    userId: conversation?.users?.[0]?.id,
+                },
+            ])
         })
-    }, [conversation])
 
-    const colorBgContainer = '#fff'
-    const borderRadiusLG = '24px'
+        // send message
+        const sendMessage = (message) => {
+            socket?.emit('incomeMessageEvent', message)
+            setMessages((messages) => [
+                ...messages,
+                {
+                    id: Math.random(),
+                    text: message,
+                    userId: token,
+                },
+            ])
+        }
 
-    return (
-        <Layout hasSider>
-            <Sider
-                style={{
-                    overflow: 'auto',
-                    height: '100vh',
-                    position: 'fixed',
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                }}
-            >
-                <div className="demo-logo-vertical" />
-                <Menu
-                    theme="dark"
-                    mode="inline"
-                    defaultSelectedKeys={['4']}
-                    items={items}
-                />
-            </Sider>
-            <Layout style={{ marginLeft: 200 }}>
-                <Header
+        const colorBgContainer = '#fff'
+        const borderRadiusLG = '24px'
+
+        return (
+            <Layout hasSider>
+                <Sider
                     style={{
-                        position: 'sticky',
+                        overflow: 'auto',
+                        height: '100vh',
+                        position: 'fixed',
+                        left: 0,
                         top: 0,
-                        zIndex: 1,
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
+                        bottom: 0,
                     }}
                 >
-                    <h1
+                    <div className="demo-logo-vertical" />
+                    <Menu
+                        theme="dark"
+                        mode="inline"
+                        defaultSelectedKeys={['4']}
+                        items={items}
+                    />
+                </Sider>
+                <Layout style={{ marginLeft: 200 }}>
+                    <Header
                         style={{
-                            color: '#fff',
+                            position: 'sticky',
+                            top: 0,
+                            zIndex: 1,
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
                         }}
                     >
-                        {conversation.users?.[0]?.id}
-                    </h1>
-                </Header>
-                <Content style={{ backgroundColor: 'white' }}>
-                    {messages.map((message) => (
-                        <div
+                        <h1
                             style={{
-                                display: 'flex',
-                                justifyContent:
-                                    message.userId === token
-                                        ? 'flex-end'
-                                        : 'flex-start',
-                                padding: '2px',
+                                color: '#fff',
                             }}
                         >
-                            <span
+                            {conversation.users?.[0]?.id}
+                        </h1>
+                    </Header>
+                    <Content style={{ backgroundColor: 'white' }}>
+                        {messages.map((message) => (
+                            <div
                                 style={{
-                                    minWidth: '100px',
-                                    textAlign: 'center',
-                                    background: colorBgContainer,
-                                    borderRadius: borderRadiusLG,
-                                    backgroundColor: 'deepskyblue',
-                                    color: 'white',
+                                    display: 'flex',
+                                    justifyContent:
+                                        message.userId === token
+                                            ? 'flex-end'
+                                            : 'flex-start',
+                                    padding: '2px',
                                 }}
                                 key={message.id}
                             >
-                                {message.text}
-                            </span>
-                        </div>
-                    ))}
-                    <div
+                                <span
+                                    style={{
+                                        minWidth: '100px',
+                                        textAlign: 'center',
+                                        background: colorBgContainer,
+                                        borderRadius: borderRadiusLG,
+                                        backgroundColor: 'deepskyblue',
+                                        color: 'white',
+                                    }}
+                                >
+                                    {message.text}
+                                </span>
+                            </div>
+                        ))}
+                        <div
+                            style={{
+                                height: '50px',
+                                width: '100%',
+                            }}
+                        ></div>
+                    </Content>
+                    <Input
                         style={{
-                            height: '50px',
+                            position: 'fixed',
+                            bottom: 0,
+                            zIndex: 1,
                             width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
                         }}
-                    ></div>
-                </Content>
-                <Input
-                    style={{
-                        position: 'fixed',
-                        bottom: 0,
-                        zIndex: 1,
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                    }}
-                />
+                        placeholder="Type a message"
+                        value={messageInputValue}
+                        onChange={(e) => {
+                            setMessageInputValue(e.target.value)
+                        }}
+                        onPressEnter={(e) => {
+                            sendMessage(messageInputValue)
+                            setMessageInputValue('')
+                            setMessages((messages) => [
+                                ...messages,
+                                {
+                                    id: Math.random(),
+                                    text: messageInputValue,
+                                    userId: token,
+                                },
+                            ])
+                        }}
+                    />
+                </Layout>
             </Layout>
-        </Layout>
-    )
+        )
+    }
+
+    return <MessageHandleComponent />
 }
 
-export default App
+export default Chat

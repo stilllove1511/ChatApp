@@ -109,7 +109,7 @@ const Routes = () => {
     return (
         <BrowserRouter>
             <Switch>
-                <PrivateRoute path={ROUTE_PATH.chat} exact>
+                <PrivateRoute path={ROUTE_PATH.home} exact>
                     <Chat />
                 </PrivateRoute>
                 <Route path={ROUTE_PATH.login}>
