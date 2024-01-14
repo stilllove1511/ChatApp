@@ -21,13 +21,14 @@ const Chat = () => {
     })
 
     const socket = conversation.id
-        ? io('localhost:3002', {
+        ? io('http://localhost:3002', {
               query: {
-                  chatWith: conversation?.users?.[0]?.id,
+                  dialogId: conversation?.id,
               },
               extraHeaders: {
-                  user: token,
+                  authorization: token,
               },
+              path: '/',
           })
         : undefined
 
@@ -194,14 +195,6 @@ const Chat = () => {
                         onPressEnter={(e) => {
                             sendMessage(messageInputValue)
                             setMessageInputValue('')
-                            setMessages((messages) => [
-                                ...messages,
-                                {
-                                    id: Math.random(),
-                                    text: messageInputValue,
-                                    userId: token,
-                                },
-                            ])
                         }}
                     />
                 </Layout>

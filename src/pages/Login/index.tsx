@@ -42,7 +42,7 @@ const Login: React.FC = () => {
                             })
                         )
 
-                        history.push('/chat')
+                        history.push('/')
                     })
                 }}
                 autoComplete="off"
