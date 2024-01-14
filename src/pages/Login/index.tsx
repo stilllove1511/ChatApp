@@ -36,7 +36,11 @@ const Login: React.FC = () => {
                         password: values.password,
                     }).then((res) => {
                         localStorage.setItem('token', res.data.id)
-                        dispatch(setUserToken(res.data.id))
+                        dispatch(
+                            setUserToken({
+                                token: res.data.id,
+                            })
+                        )
 
                         history.push('/chat')
                     })

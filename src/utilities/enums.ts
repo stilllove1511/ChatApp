@@ -56,4 +56,5 @@ export const HTTP_STATUS_CODE_MESSAGE = {
 
 export enum ENDPOINT_API {
     login = '/account/login',
+    getAllDialog = '/dialog/get_all',
 }
