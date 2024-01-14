@@ -3,10 +3,12 @@ import type { MenuProps } from 'antd'
 import { Layout, Menu } from 'antd'
 import API from '@configs/api'
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
+import { useSelector } from 'react-redux'
 
 const { Header, Content, Footer, Sider } = Layout
 
 const App: React.FC = () => {
+    const token = useSelector((state) => (state as any).auth.token)
     const [dialogs, setDialogs] = useState([])
     const [conversation, setConversation] = useState<{
         id: string
@@ -45,6 +47,19 @@ const App: React.FC = () => {
             setDialogs(res.data)
         })
     }, [])
+
+    // fetch messages
+    const [messages, setMessages] = useState([])
+    useEffect(() => {
+        if (!conversation.id) return
+        API.fetchMessages({
+            dialogId: conversation.id,
+            limit: 100,
+            page: 1,
+        }).then((res) => {
+            setMessages(res.data.messages)
+        })
+    }, [conversation])
 
     const colorBgContainer = '#fff'
     const borderRadiusLG = '24px'
@@ -88,26 +103,33 @@ const App: React.FC = () => {
                         {conversation.users?.[0]?.id}
                     </h1>
                 </Header>
-                <Content style={{ margin: '24px 16px 0' }}>
-                    <div
-                        style={{
-                            padding: 24,
-                            textAlign: 'center',
-                            background: colorBgContainer,
-                            borderRadius: borderRadiusLG,
-                        }}
-                    >
-                        <p>long content</p>
-                        {
-                            // indicates very long content
-                            Array.from({ length: 100 }, (_, index) => (
-                                <React.Fragment key={index}>
-                                    {index % 20 === 0 && index ? 'more' : '...'}
-                                    <br />
-                                </React.Fragment>
-                            ))
-                        }
-                    </div>
+                <Content style={{ backgroundColor: 'white' }}>
+                    {messages.map((message) => (
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent:
+                                    message.userId === token
+                                        ? 'flex-end'
+                                        : 'flex-start',
+                                padding: '2px',
+                            }}
+                        >
+                            <span
+                                style={{
+                                    minWidth: '100px',
+                                    textAlign: 'center',
+                                    background: colorBgContainer,
+                                    borderRadius: borderRadiusLG,
+                                    backgroundColor: 'deepskyblue',
+                                    color: 'white',
+                                }}
+                                key={message.id}
+                            >
+                                {message.text}
+                            </span>
+                        </div>
+                    ))}
                 </Content>
             </Layout>
         </Layout>
