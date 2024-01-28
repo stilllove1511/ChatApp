@@ -5,11 +5,13 @@ import API from '@configs/api'
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
 import { useSelector } from 'react-redux'
 import { io } from 'socket.io-client'
+import SearchUser from '@components/SearchUser'
+import { SOCKET_EVENT } from '@utilities/enums'
 
 const { Header, Content, Sider } = Layout
 
 const Chat = () => {
-    const token = useSelector((state) => (state as any).auth.token)
+    const userId = useSelector((state) => (state as any).auth.token)
     const [conversation, setConversation] = useState<{
         id: string
         users: {
@@ -26,14 +28,21 @@ const Chat = () => {
                   dialogId: conversation?.id,
               },
               extraHeaders: {
-                  authorization: token,
+                  authorization: userId,
               },
               path: '/',
           })
         : undefined
 
     const MessageHandleComponent: React.FC = () => {
-        const [dialogs, setDialogs] = useState([])
+        const [dialogs, setDialogs] = useState<
+            {
+                id: string
+                users: {
+                    id: string
+                }[]
+            }[]
+        >([])
 
         // chat dialogs menu items
         const items: MenuProps['items'] = dialogs.map((dialog) => ({
@@ -72,14 +81,14 @@ const Chat = () => {
                 limit: 100,
                 page: 1,
             }).then((res) => {
-                setMessages(res.data.messages)
+                setMessages((res.data.messages as string[]).reverse())
             })
         }, [conversation])
 
         const [messageInputValue, setMessageInputValue] = useState('')
 
         useEffect(() => {
-            socket?.on('receiveMessageEvent', (message) => {
+            socket?.on(SOCKET_EVENT.SERVER_SEND_MESSAGE_EVENT, (message) => {
                 setMessages((messages) => [
                     ...messages,
                     {
@@ -93,13 +102,13 @@ const Chat = () => {
 
         // send message
         const sendMessage = (message) => {
-            socket?.emit('incomeMessageEvent', message)
+            socket?.emit(SOCKET_EVENT.CLIENT_SEND_MESSAGE_EVENT, message)
             setMessages((messages) => [
                 ...messages,
                 {
                     id: Math.random(),
                     text: message,
-                    userId: token,
+                    userId,
                 },
             ])
         }
@@ -119,7 +128,27 @@ const Chat = () => {
                         bottom: 0,
                     }}
                 >
-                    <div className="demo-logo-vertical" />
+                    <SearchUser
+                        onSelect={(user) => {
+                            const dialog = dialogs.find((dialog) =>
+                                dialog.users.some((u) => u.id === user.id)
+                            )
+
+                            if (dialog) {
+                                setConversation(dialog)
+                            } else {
+                                API.createDialog({
+                                    userIds: [user.id, userId],
+                                }).then((res) => {
+                                    setConversation(res.data)
+                                    setDialogs((dialogs) => [
+                                        ...dialogs,
+                                        res.data,
+                                    ])
+                                })
+                            }
+                        }}
+                    />
                     <Menu
                         theme="dark"
                         mode="inline"
@@ -152,7 +181,7 @@ const Chat = () => {
                                 style={{
                                     display: 'flex',
                                     justifyContent:
-                                        message.userId === token
+                                        message.userId === userId
                                             ? 'flex-end'
                                             : 'flex-start',
                                     padding: '2px',

@@ -13,8 +13,8 @@ const API = {
     fetchDialogs: () => httpAuth.get(ENDPOINT_API.getAllDialog, {}),
     fetchMessages: ({
         dialogId,
-        page,
-        limit,
+        page = 1,
+        limit = 10,
     }: {
         dialogId: string
         page: number
@@ -22,10 +22,19 @@ const API = {
     }) =>
         httpAuth.get(`/dialog/${dialogId}/messages`, {
             params: {
-                page: 1,
-                limit: 10,
+                page,
+                limit,
             },
         }),
+
+    searchUser: (data: { search: string }) =>
+        httpAuth.get(ENDPOINT_API.searchUser, {
+            params: {
+                search: data.search,
+            },
+        }),
+    createDialog: (data: { userIds: string[] }) =>
+        httpAuth.post(ENDPOINT_API.createDialog, data),
 }
 
 export default API

@@ -57,4 +57,11 @@ export const HTTP_STATUS_CODE_MESSAGE = {
 export enum ENDPOINT_API {
     login = '/account/login',
     getAllDialog = '/dialog/get_all',
+    searchUser = '/user/search',
+    createDialog = '/dialog/create',
+}
+
+export enum SOCKET_EVENT {
+    SERVER_SEND_MESSAGE_EVENT = 'serverSendMessageEvent',
+    CLIENT_SEND_MESSAGE_EVENT = 'clientSendMessageEvent',
 }
