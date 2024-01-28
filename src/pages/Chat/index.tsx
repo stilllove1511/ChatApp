@@ -23,7 +23,7 @@ const Chat = () => {
     })
 
     const socket = conversation.id
-        ? io('http://localhost:3002', {
+        ? io(process.env.REACT_APP_SOCKET_HOST, {
               query: {
                   dialogId: conversation?.id,
               },
