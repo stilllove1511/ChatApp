@@ -52,20 +52,27 @@ const Chat = () => {
                             }}
                             key={index}
                         >
-                            <span
+                            <div
                                 style={{
                                     minWidth: '100px',
-                                    textAlign: 'center',
+                                    maxWidth: '80%',
                                     background: colorBgContainer,
                                     borderRadius: borderRadiusLG,
                                     backgroundColor: 'deepskyblue',
                                     color: 'white',
-                                    padding: '0 10px',
-                                    maxWidth: '80%',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    padding: '0 24px',
                                 }}
                             >
-                                {message.text}
-                            </span>
+                                <span
+                                    style={{
+                                        textAlign: 'left',
+                                    }}
+                                >
+                                    {message.text}
+                                </span>
+                            </div>
                         </div>
                     ))}
                     <div
