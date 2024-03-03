@@ -36,7 +36,7 @@ const API = {
     createDialog: (data: { userIds: string[] }) =>
         httpAuth.post(ENDPOINT_API.createDialog, data),
     ask: (question: string) => {
-        return http.post('ask', { question })
+        return http.post('ask', { question, topK: 10 })
     },
 }
 
