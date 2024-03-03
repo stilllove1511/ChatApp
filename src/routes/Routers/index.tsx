@@ -1,7 +1,5 @@
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import PrivateRoute from '@routes/PrivateRouter'
-import Login from '@pages/Login'
-import Page404 from '@pages/Page404'
 import {
     PERMISSION_DEFAULT,
     RESOURCE_DEFAULT,
@@ -109,14 +107,8 @@ const Routes = () => {
     return (
         <BrowserRouter>
             <Switch>
-                <PrivateRoute path={ROUTE_PATH.home} exact>
-                    <Chat />
-                </PrivateRoute>
-                <Route path={ROUTE_PATH.login}>
-                    <Login />
-                </Route>
                 <Route path="*">
-                    <Page404 />
+                    <Chat />
                 </Route>
             </Switch>
         </BrowserRouter>
