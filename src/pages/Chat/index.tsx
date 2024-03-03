@@ -60,6 +60,7 @@ const Chat = () => {
                                     borderRadius: borderRadiusLG,
                                     backgroundColor: 'deepskyblue',
                                     color: 'white',
+                                    padding: '0 10px',
                                 }}
                             >
                                 {message.text}
