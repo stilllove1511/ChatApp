@@ -61,6 +61,7 @@ const Chat = () => {
                                     backgroundColor: 'deepskyblue',
                                     color: 'white',
                                     padding: '0 10px',
+                                    maxWidth: '80%',
                                 }}
                             >
                                 {message.text}
